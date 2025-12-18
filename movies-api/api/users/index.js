@@ -2,6 +2,7 @@ import express from 'express';
 import User from './userModel';
 import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
+import authenticate from '../../authenticate';
 
 
 const router = express.Router(); // eslint-disable-line
@@ -34,7 +35,14 @@ router.post('/', asyncHandler(async (req, res) => {
     }
 }));
 
-// ... Code as before
+    router.get('/protected', authenticate, (req, res) => {
+    res.status(200).json({
+        success: true,
+        msg: 'You are authenticated',
+        user: { id: req.user._id, username: req.user.username }
+    });
+    });
+
 
 
 
@@ -56,7 +64,13 @@ async function registerUser(req, res) {
     return res.status(400).json({ success: false, msg: 'Username is required.' });
   }
 
-  await User.create(req.body);
+  const existing = await User.findByUserName(username);
+    if (existing) {
+    return res.status(409).json({ success: false, msg: 'Username already exists.' });
+    }
+
+    await User.create({ username, password });
+
   res.status(201).json({ success: true, msg: 'User successfully created.' });
 }
 
@@ -69,8 +83,8 @@ async function authenticateUser(req, res) {
 
     const isMatch = await user.comparePassword(req.body.password);
     if (isMatch) {
-        const token = jwt.sign({ username: user.username }, process.env.SECRET);
-        res.status(200).json({ success: true, token: 'BEARER ' + token });
+        const token = jwt.sign({ username: user.username }, process.env.SECRET,{expiresIn:'2h'});
+        res.status(200).json({ success: true, token,username:user.username,userId: user._id });
     } else {
         res.status(401).json({ success: false, msg: 'Wrong password.' });
     }

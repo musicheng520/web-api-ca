@@ -2,27 +2,41 @@ import jwt from 'jsonwebtoken';
 import User from '../api/users/userModel';
 
 const authenticate = async (request, response, next) => {
-    try { 
-        const authHeader = request.headers.authorization;
-        if (!authHeader) throw new Error('No authorization header');
-
-        const token = authHeader.split(" ")[1];
-        if (!token) throw new Error('Bearer token not found');
-
-        const decoded = await jwt.verify(token, process.env.SECRET); 
-        console.log(decoded);
-
-        // Assuming decoded contains a username field
-        const user = await User.findByUserName(decoded.username); 
-        if (!user) {
-            throw new Error('User not found');
-        }
-        // Optionally attach the user to the request for further use
-        request.user = user; 
-        next();
-    } catch(err) {
-        next(new Error(`Verification Failed: ${err.message}`));
+  try {
+    const authHeader = request.headers.authorization;
+    if (!authHeader) {
+      return response.status(401).json({ success: false, msg: 'No authorization header' });
     }
+
+    const [scheme, token] = authHeader.split(' ');
+    if (!scheme || scheme.toLowerCase() !== 'bearer') {
+      return response.status(401).json({ success: false, msg: 'Invalid authorization scheme' });
+    }
+    if (!token) {
+      return response.status(401).json({ success: false, msg: 'Bearer token not found' });
+    }
+
+    const decoded = jwt.verify(token, process.env.SECRET);
+
+    let user = null;
+    if (decoded.id) {
+      user = await User.findById(decoded.id);
+    } else if (decoded.username) {
+      user = await User.findByUserName(decoded.username);
+    }
+
+    if (!user) {
+      return response.status(401).json({ success: false, msg: 'User not found' });
+    }
+
+    request.user = user;
+    next();
+  } catch (err) {
+    return response.status(401).json({
+      success: false,
+      msg: `Unauthorized: ${err.message}`
+    });
+  }
 };
 
 export default authenticate;
