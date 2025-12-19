@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Navigate, Routes, Link } from "react-router";
+import { BrowserRouter, Route, Navigate, Routes, Link } from "react-router-dom";
 import HomePage from "./pages/homePage";
 import MoviePage from "./pages/movieDetailsPage";
 import FavoriteMoviesPage from "./pages/favoriteMoviesPage";
@@ -17,6 +17,12 @@ import NowPlayingMoviesPage from "./pages/nowPlayingMoviesPage";
 import PersonPage from "./pages/PersonDetailsPage";
 import MustWatchPage from "./pages/mustWatchPage";
 import SearchResultsPage from "./pages/SearchResultPage";
+import AuthContextProvider from "./contexts/authContext";
+import ProtectedRoutes from "./protectedRoutes";
+import LoginPage from "./pages/loginPage";
+import SignupPage from "./pages/signupPage";
+
+
 
 
 
@@ -36,27 +42,39 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <SiteHeader />
-        <MoviesContextProvider>
-          <Routes>
-            <Route path="/movies/favorites" element={<FavoriteMoviesPage />} />
-            <Route path="/reviews/:id" element={ <MovieReviewPage /> } />
-            <Route path="/movies/:id" element={<MoviePage />} />
-            <Route path="/" element={<HomePage />} />
-            <Route path="/movies/upcoming" element={<UpcomingMoviesPage />} />
-            <Route path="/movies/popular" element={<PopularMoviesPage />} />
-            <Route path="/movies/mustWatch" element={<MustWatchPage />} />
-            <Route path="/movies/top_rated" element={<TopRatedMoviesPage />} />
-            <Route path="/movies/now_playing" element={<NowPlayingMoviesPage />} />
-            <Route path="/reviews/form" element={ <AddMovieReviewPage /> } />
-            <Route path="/person/:id" element={<PersonPage />} />
-            <Route path="/search" element={<SearchResultsPage />} />
-            <Route path="*" element={ <Navigate to="/" /> } />
-            
+  <AuthContextProvider>
+    <SiteHeader />
+    <MoviesContextProvider>
+      <Routes>
+        {/* auth */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-          </Routes>
-        </MoviesContextProvider>
-      </BrowserRouter>
+
+        {/* public */}
+        <Route path="/reviews/:id" element={<MovieReviewPage />} />
+        <Route path="/movies/:id" element={<MoviePage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/movies/upcoming" element={<UpcomingMoviesPage />} />
+        <Route path="/movies/popular" element={<PopularMoviesPage />} />
+        <Route path="/movies/top_rated" element={<TopRatedMoviesPage />} />
+        <Route path="/movies/now_playing" element={<NowPlayingMoviesPage />} />
+        <Route path="/reviews/form" element={<AddMovieReviewPage />} />
+        <Route path="/person/:id" element={<PersonPage />} />
+        <Route path="/search" element={<SearchResultsPage />} />
+
+        {/* protected */}
+        <Route element={<ProtectedRoutes />}>
+          <Route path="/movies/favorites" element={<FavoriteMoviesPage />} />
+          <Route path="/movies/mustWatch" element={<MustWatchPage />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </MoviesContextProvider>
+  </AuthContextProvider>
+</BrowserRouter>
+
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

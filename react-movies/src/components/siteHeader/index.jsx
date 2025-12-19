@@ -7,11 +7,14 @@ import Button from "@mui/material/Button";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import SearchBar from "../searchBar";
+import { useContext } from "react";
+import { AuthContext } from "../../contexts/authContext";
+
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
@@ -24,15 +27,25 @@ const SiteHeader = () => {
   
   const navigate = useNavigate();
 
+  const auth = useContext(AuthContext);
+
+
 const menuOptions = [
   { label: "Home", path: "/" },
-  { label: "Favorites", path: "/movies/favorites" },
-  { label: "Must Watch", path: "/movies/mustWatch" },
+
+  ...(auth.isAuthenticated
+    ? [
+        { label: "Favorites", path: "/movies/favorites" },
+        { label: "Must Watch", path: "/movies/mustWatch" },
+      ]
+    : []),
+
   { label: "Popular", path: "/movies/popular" },
   { label: "Top Rated", path: "/movies/top_rated" },
   { label: "Now Playing", path: "/movies/now_playing" },
   { label: "Upcoming", path: "/movies/upcoming" },
 ];
+
 
 
 
@@ -82,27 +95,61 @@ const menuOptions = [
                   onClose={() => setAnchorEl(null)}
                 >
                   {menuOptions.map((opt) => (
-                    <MenuItem
-                      key={opt.label}
-                      onClick={() => handleMenuSelect(opt.path)}
-                    >
+                    <MenuItem key={opt.label} onClick={() => handleMenuSelect(opt.path)}>
                       {opt.label}
                     </MenuItem>
                   ))}
+
+                  {!auth.isAuthenticated ? (
+                    <MenuItem onClick={() => handleMenuSelect("/login")}>Login</MenuItem>
+                  ) : (
+                    <MenuItem
+                      onClick={() => {
+                        auth.signout();
+                        handleMenuSelect("/");
+                      }}
+                    >
+                      Logout
+                    </MenuItem>
+                  )}
                 </Menu>
               </>
             ) : (
               <>
                 {menuOptions.map((opt) => (
-                  <Button
-                    key={opt.label}
-                    color="inherit"
-                    onClick={() => handleMenuSelect(opt.path)}
-                  >
-                    {opt.label}
-                  </Button>
-                ))}
-                <SearchBar />
+                    <Button
+                      key={opt.label}
+                      color="inherit"
+                      onClick={() => handleMenuSelect(opt.path)}
+                    >
+                      {opt.label}
+                    </Button>
+                  ))}
+
+                  {!auth.isAuthenticated ? (
+                    <>
+  <Button color="inherit" onClick={() => handleMenuSelect("/login")}>
+    Login
+  </Button>
+  <Button color="inherit" onClick={() => handleMenuSelect("/signup")}>
+    Signup
+  </Button>
+</>
+
+                  ) : (
+                    <Button
+                      color="inherit"
+                      onClick={() => {
+                        auth.signout();
+                        handleMenuSelect("/");
+                      }}
+                    >
+                      Logout
+                    </Button>
+                  )}
+
+                  <SearchBar />
+
               </>
             )}
         </Toolbar>
