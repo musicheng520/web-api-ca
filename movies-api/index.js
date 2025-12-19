@@ -5,7 +5,8 @@ import './db';
 import cors from 'cors';
 import usersRouter from './api/users';
 import moviesRouter from './api/movies';   
-
+import peopleRouter from './api/people';
+import searchRouter from './api/search';
 
 dotenv.config();
 
@@ -32,6 +33,9 @@ app.use(express.json());
 //Users router
 app.use('/api/users', usersRouter);
 app.use('/api/movies', moviesRouter); 
+app.use("/api/people", peopleRouter);
+app.use("/api/search", searchRouter);
+
 
 app.use(errHandler);
 
