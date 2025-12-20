@@ -1,14 +1,27 @@
-import React, { useContext } from "react";
-import { MoviesContext } from "../../contexts/moviesContext";
+import React from "react";
 import IconButton from "@mui/material/IconButton";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addFavourite } from "../../api/tmdb-api";
 
 const AddToFavoritesIcon = ({ movie }) => {
-  const context = useContext(MoviesContext);
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      addFavourite({
+        movieId: movie.id,
+        title: movie.title,
+        posterPath: movie.poster_path,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["favourites"] });
+    },
+  });
 
   const handleAddToFavorites = (e) => {
     e.preventDefault();
-    context.addToFavorites(movie);
+    mutation.mutate();
   };
 
   return (

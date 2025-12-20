@@ -359,8 +359,7 @@ export const getMovieReviews = ({ queryKey }) => {
     });
 };
 
-// If you keep these helpers, point them to your backend.
-// Better: delete them and use getMovies({category,page}) everywhere.
+
 export const getUpcomingMovies = () => {
   return fetch(`${API_BASE}/movies/upcoming?page=1`)
     .then((response) => {
@@ -489,4 +488,59 @@ export const searchMulti = ({ queryKey }) => {
       console.error("Error fetching search results:", error);
       throw error;
     });
+};
+
+//favourite movie
+const getAuthHeader = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const getFavourites = () => {
+  return fetch(`${API_BASE}/favourites`, {
+    headers: {
+      ...getAuthHeader(),
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      return response.json().then((error) => {
+        throw new Error(error.msg || error.message || "Failed to fetch favourites");
+      });
+    }
+    return response.json();
+  });
+};
+
+export const addFavourite = (payload) => {
+  return fetch(`${API_BASE}/favourites`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
+    body: JSON.stringify(payload),
+  }).then((response) => {
+    if (!response.ok) {
+      return response.json().then((error) => {
+        throw new Error(error.msg || error.message || "Failed to add favourite");
+      });
+    }
+    return response.json();
+  });
+};
+
+export const deleteFavourite = (favouriteId) => {
+  return fetch(`${API_BASE}/favourites/${favouriteId}`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeader(),
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      return response.json().then((error) => {
+        throw new Error(error.msg || error.message || "Failed to delete favourite");
+      });
+    }
+    return response.json();
+  });
 };
