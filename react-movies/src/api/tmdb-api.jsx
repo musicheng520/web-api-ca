@@ -544,3 +544,50 @@ export const deleteFavourite = (favouriteId) => {
     return response.json();
   });
 };
+
+// watchlist
+export const getWatchlist = () =>
+  fetch(`${API_BASE}/watchlist`, {
+    headers: {
+      ...getAuthHeader(),
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      return response.json().then((error) => {
+        throw new Error(error.msg || error.message || "Failed to fetch watchlist");
+      });
+    }
+    return response.json();
+  });
+
+export const addToWatchlist = (movie) =>
+  fetch(`${API_BASE}/watchlist`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+    },
+    body: JSON.stringify(movie),
+  }).then((response) => {
+    if (!response.ok) {
+      return response.json().then((error) => {
+        throw new Error(error.msg || error.message || "Failed to add to watchlist");
+      });
+    }
+    return response.json();
+  });
+
+export const deleteFromWatchlist = (id) =>
+  fetch(`${API_BASE}/watchlist/${id}`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeader(),
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      return response.json().then((error) => {
+        throw new Error(error.msg || error.message || "Failed to remove from watchlist");
+      });
+    }
+    return response.json();
+  });

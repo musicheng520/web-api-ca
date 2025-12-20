@@ -8,6 +8,10 @@ import moviesRouter from './api/movies';
 import peopleRouter from './api/people';
 import searchRouter from './api/search';
 import favouritesRouter from "./api/favourites/index.js";
+import watchlistRouter from "./api/watchlist";
+
+
+
 
 
 
@@ -39,7 +43,7 @@ app.use('/api/movies', moviesRouter);
 app.use("/api/people", peopleRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/favourites", favouritesRouter);
-
+app.use("/api/watchlist", watchlistRouter);
 
 app.use(errHandler);
 
