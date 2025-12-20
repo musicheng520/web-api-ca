@@ -20,6 +20,7 @@ const AddToFavoritesIcon = ({ movie }) => {
   });
 
   const handleAddToFavorites = (e) => {
+
     e.preventDefault();
     mutation.mutate();
   };
