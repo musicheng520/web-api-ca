@@ -10,6 +10,7 @@ router.get(
   "/",
   authenticate,
   asyncHandler(async (req, res) => {
+    res.set("Cache-Control", "no-store");
     const list = await Watchlist.find({ user: req.user._id });
     res.status(200).json(list);
   })

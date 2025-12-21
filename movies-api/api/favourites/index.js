@@ -10,6 +10,7 @@ router.get(
   "/",
   authenticate,
   asyncHandler(async (req, res) => {
+    res.set("Cache-Control", "no-store");
     const favourites = await Favourite.find({ user: req.user._id }).sort({
       createdAt: -1,
     });
