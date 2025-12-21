@@ -73,11 +73,10 @@ A separate API was created to manage **user-specific movie data**.
 ## How to Run the Project
 
 ### Backend
-```bash
 cd movies-api
 npm install
 npm run dev
- 
+
 ### Frontend
 cd react-movies
 npm install
